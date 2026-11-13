@@ -1,5 +1,7 @@
 package com.contact.management.module.contact;
 
+import java.util.Locale;
+
 import org.springframework.stereotype.Component;
 
 import com.contact.management.module.contact.domain.Contact;
@@ -46,7 +48,7 @@ public class ContactMapper {
 
     public static String normaliseEmail(final String email) {
         final String value = blankToNull(email);
-        return value == null ? null : value.toLowerCase();
+        return value == null ? null : value.toLowerCase(Locale.ROOT);
     }
 
     private String trim(final String value) {

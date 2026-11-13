@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.dao.DuplicateKeyException;
@@ -82,7 +83,7 @@ public class ContactPersistent {
                   """;
 
         final Map<String, Object> parameters = excludeId == null
-                ? MapUtils.of("email", email.toLowerCase())
+                ? MapUtils.of("email", email.toLowerCase(Locale.ROOT))
                 : MapUtils.of("email", email.toLowerCase(), "excludeId", excludeId);
 
         return jdbc.exists(sql, parameters);
@@ -189,7 +190,7 @@ public class ContactPersistent {
                         OR LOWER(COALESCE(company, '')) LIKE :keyword
                     )
                     """);
-            parameters.put("keyword", "%" + filter.q().trim().toLowerCase() + "%");
+            parameters.put("keyword", "%" + filter.q().trim().toLowerCase(Locale.ROOT) + "%");
         }
 
         if (filter.category() != null) {
