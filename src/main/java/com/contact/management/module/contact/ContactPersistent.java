@@ -254,8 +254,8 @@ public class ContactPersistent {
                 rs.getString("notes"),
                 Category.valueOf(rs.getString("category")),
                 rs.getBoolean("favorite"),
-                createdAt == null ? null : createdAt.toInstant(),
-                updatedAt == null ? null : updatedAt.toInstant());
+                createdAt == null ? null : createdAt.toInstant().toString(),
+                updatedAt == null ? null : updatedAt.toInstant().toString());
     }
 
     private boolean hasUniqueViolation(final Throwable throwable) {
