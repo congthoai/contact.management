@@ -5,7 +5,8 @@ public enum ResponseCode {
     Error(400, "Something wrong"),
     Unauthorized(401, "Unauthorized"),
     PermissionDenied(403, "Permission denied"),
-    NothingFound(404, "Nothing found");
+    NothingFound(404, "Nothing found"),
+    Conflict(409, "Conflict");
 
     public final int code;
     public final String message;
