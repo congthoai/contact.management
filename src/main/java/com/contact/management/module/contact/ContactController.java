@@ -1,6 +1,5 @@
 package com.contact.management.module.contact;
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.contact.management.module.contact.domain.Category;
 import com.contact.management.module.contact.domain.ContactFilter;
@@ -79,14 +77,8 @@ public class ContactController {
     }
 
     @PostMapping
-    public ResponseEntity<ContactResponse> create(@Valid @RequestBody final ContactForm form) {
-        final ContactResponse created = service.create(form);
-        final URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(created.id())
-                .toUri();
-
-        return ResponseEntity.created(location).body(created);
+    public ContactResponse create(@Valid @RequestBody final ContactForm form) {
+        return service.create(form);
     }
 
     @PutMapping("/{id:[1-9][0-9]*}")
@@ -100,8 +92,8 @@ public class ContactController {
     }
 
     @DeleteMapping("/{id:[1-9][0-9]*}")
-    public ResponseEntity<Void> delete(@PathVariable final long id) {
+    public boolean delete(@PathVariable final long id) {
         service.delete(id);
-        return ResponseEntity.noContent().build();
+        return true;
     }
 }
