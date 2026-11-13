@@ -112,23 +112,31 @@ public class ContactPersistent {
     }
 
     public Contact update(final long id, final Contact contact) {
-        final int updated = jdbc.update("""
-                UPDATE contacts
-                SET first_name = :firstName,
-                    last_name = :lastName,
-                    email = :email,
-                    phone = :phone,
-                    company = :company,
-                    job_title = :jobTitle,
-                    address = :address,
-                    notes = :notes,
-                    category = :category,
-                    favorite = :favorite,
-                    updated_at = now()
-                WHERE id = :id
-                """, toParameters(id, contact));
+        try {
+            final int updated = jdbc.update("""
+                    UPDATE contacts
+                    SET first_name = :firstName,
+                        last_name = :lastName,
+                        email = :email,
+                        phone = :phone,
+                        company = :company,
+                        job_title = :jobTitle,
+                        address = :address,
+                        notes = :notes,
+                        category = :category,
+                        favorite = :favorite,
+                        updated_at = now()
+                    WHERE id = :id
+                    """, toParameters(id, contact));
 
-        return updated == 0 ? null : findById(id);
+            return updated == 0 ? null : findById(id);
+        } catch (final RuntimeException exception) {
+            if (hasUniqueViolation(exception)) {
+                throw new DuplicateKeyException("A contact with this email already exists", exception);
+            }
+
+            throw exception;
+        }
     }
 
     public Contact toggleFavorite(final long id) {
@@ -204,9 +212,10 @@ public class ContactPersistent {
 
     private Map<String, Object> withPagination(final Map<String, Object> parameters,
             final int size, final long offset) {
-        parameters.put("limit", size);
-        parameters.put("offset", offset);
-        return parameters;
+        final Map<String, Object> paginated = new HashMap<>(parameters);
+        paginated.put("limit", size);
+        paginated.put("offset", offset);
+        return paginated;
     }
 
     private Map<String, Object> toParameters(final Contact contact) {

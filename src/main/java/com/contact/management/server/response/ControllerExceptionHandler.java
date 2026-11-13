@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.contact.management.domain.ResponseException;
@@ -26,6 +27,14 @@ public class ControllerExceptionHandler {
                 .findFirst()
                 .map(error -> error.getField() + " " + error.getDefaultMessage())
                 .orElse("Request validation failed");
+
+        return ResponseEntity.badRequest()
+                .body(new Response(HttpStatus.BAD_REQUEST.value(), message));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Response> invalidParameter(final MethodArgumentTypeMismatchException exception) {
+        final String message = "Parameter " + exception.getName() + " contains wrong value";
 
         return ResponseEntity.badRequest()
                 .body(new Response(HttpStatus.BAD_REQUEST.value(), message));
