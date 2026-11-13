@@ -1,10 +1,14 @@
 package com.contact.management.module.user;
 
+import java.util.List;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.contact.management.domain.ResponseCode;
 import com.contact.management.domain.ResponseException;
+import com.contact.management.module.role.RoleService;
+import com.contact.management.module.role.domain.Role;
 import com.contact.management.module.user.domain.UserCreationInfo;
 import com.contact.management.module.user.domain.UserPrincipal;
 import com.contact.management.module.user.domain.UserProfile;
@@ -14,10 +18,13 @@ import com.contact.management.module.user.validator.UserCreationInfoValidator;
 public class UserService {
 
     private final UserRepository repository;
+    private final RoleService roleService;
     private final UserCreationInfoValidator validator;
 
-    public UserService(final UserRepository repository, final UserCreationInfoValidator validator) {
+    public UserService(final UserRepository repository, final RoleService roleService,
+            final UserCreationInfoValidator validator) {
         this.repository = repository;
+        this.roleService = roleService;
         this.validator = validator;
     }
 
@@ -27,7 +34,13 @@ public class UserService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return user;
+        final List<String> roles = roleService.findByUserId(user.id)
+                .stream()
+                .map(role -> role.name)
+                .toList();
+
+        return new UserPrincipal(user.id, user.username, user.password,
+                user.firstName, user.lastName, roles);
     }
 
     public UserProfile getProfile(final String username) {

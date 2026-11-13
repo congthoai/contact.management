@@ -1,5 +1,6 @@
 package com.contact.management.module.user;
 
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.contact.management.module.role.domain.Role;
 import com.contact.management.module.user.domain.UserCreationInfo;
 import com.contact.management.module.user.domain.UserProfile;
 
@@ -30,6 +32,12 @@ public class UserController {
 
     @GetMapping("/me")
     public UserProfile getProfile(@AuthenticationPrincipal final Jwt jwt) {
+        return service.getProfile(jwt.getSubject());
+    }
+
+    @Secured(Role.ADMIN)
+    @GetMapping("/admin/me")
+    public UserProfile getAdminProfile(@AuthenticationPrincipal final Jwt jwt) {
         return service.getProfile(jwt.getSubject());
     }
 }
